@@ -1,30 +1,31 @@
 import pytest
+import time
+import math
 from selenium import webdriver
-from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 
-link = "http://selenium1py.pythonanywhere.com/"
-
-
-@pytest.fixture(scope="class")
+@pytest.fixture
 def browser():
-    print("\nstart browser for test..")
     browser = webdriver.Chrome()
     yield browser
-    print("\nquit browser..")
     browser.quit()
 
-
-class TestMainPage1():
-
-    # вызываем фикстуру в тесте, передав ее как параметр
-    def test_guest_should_see_login_link(self, browser):
-        print("start test1")
-        browser.get(link)
-        browser.find_element(By.CSS_SELECTOR, "#login_link")
-        print("finish test1")
-
-    def test_guest_should_see_basket_link_on_the_main_page(self, browser):
-        print("start test2")
-        browser.get(link)
-        browser.find_element(By.CSS_SELECTOR, ".basket-mini .btn-group > a")
-        print("finish test2")
+@pytest.mark.parametrize("url", [
+    "https://stepik.org/lesson/236895/step/1",
+    "https://stepik.org/lesson/236896/step/1",
+    "https://stepik.org/lesson/236897/step/1",
+    "https://stepik.org/lesson/236898/step/1",
+    "https://stepik.org/lesson/236899/step/1",
+    "https://stepik.org/lesson/236903/step/1",
+    "https://stepik.org/lesson/236904/step/1",
+    "https://stepik.org/lesson/236905/step/1"
+])
+def test_feedback_message(browser, url):
+    browser.get(url)
+    answer = math.log(int(time.time()))
+    input_field = browser.find_element_by_css_selector("textarea")
+    input_field.send_keys(str(answer))
+    submit_button = browser.find_element(By.C)             ("button.submit-submission")
+    submit_button.click()
+    feedback = browser.find_element_by_css_selector("pre.smart-hints__hint")
+    assert feedback.text == "Correct!", f"Expected 'Correct!' in feedback, but got '{feedback.text}'"
